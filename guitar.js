@@ -2,10 +2,11 @@ const selectElement = document.querySelector('#durationRange');
 var waitDuration = selectElement.value * 1000;
 var alive = false;
 var runTimeout = null;
+var beep = new Audio('beep.wav');
 
 // Listener to update the text for the duration range slider
 selectElement.addEventListener('input', (event) => {
-  const result = document.querySelector('#durationtext');
+  const result = document.querySelector('#durationText');
   result.textContent = event.target.value;
 });
 
@@ -14,14 +15,18 @@ selectElement.addEventListener('change', (event) => {
   waitDuration = event.target.value * 1000;
 });
 
-function randomNote() {
+function randomNote(includeAccidentals) {
   const wholeNotes = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-  return wholeNotes[Math.floor(Math.random() * wholeNotes.length)];
-}
-
-function updateNoteText() {
-  const result = document.querySelector('#note');
-  result.textContent = randomNote();
+  const flat = '\u266D';
+  const sharp = '\u266F';
+  var returnNote = wholeNotes[Math.floor(Math.random() * wholeNotes.length)];
+  if(includeAccidentals) {
+    if(Math.random() >= 0.5) { // 50% chance that we will return a note with sharp or flat (as opposed to one without)
+      var accidental = (Math.random() >= 0.5) ? flat : sharp // 50%/50% chance for sharp or flat
+      returnNote += accidental
+    }
+  }
+  return returnNote;
 }
 
 // Handle CSS and UI changes for Start / Stop button
@@ -52,7 +57,16 @@ function changeState() {
 
 function run() {
   if(alive) {
-    updateNoteText();
+
+    const beepCheck = document.querySelector('#beepCheckbox');
+    if(beepCheck.checked) {
+      beep.play();
+    }
+
+    const noteBox = document.querySelector('#note');
+    const accidentalsCheck = document.querySelector('#accidentalsCheckbox');
+    noteBox.textContent = randomNote(accidentalsCheck.checked);
+
     runTimeout = setTimeout(run, waitDuration);
   }
 }
