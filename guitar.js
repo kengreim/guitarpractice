@@ -15,16 +15,22 @@ selectElement.addEventListener('change', (event) => {
   waitDuration = event.target.value * 1000;
 });
 
-function randomNote(includeAccidentals) {
+function randomNote(includeAccidentals, includeString) {
   const wholeNotes = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
   const flat = '\u266D';
   const sharp = '\u266F';
+  const strings = ['E2', 'A', 'D', 'G', 'B', 'E4'];
   var returnNote = wholeNotes[Math.floor(Math.random() * wholeNotes.length)];
   if(includeAccidentals) {
     if(Math.random() >= 0.5) { // 50% chance that we will return a note with sharp or flat (as opposed to one without)
-      var accidental = (Math.random() >= 0.5) ? flat : sharp // 50%/50% chance for sharp or flat
-      returnNote += accidental
+      var accidental = (Math.random() >= 0.5) ? flat : sharp; // 50%/50% chance for sharp or flat
+      returnNote += accidental;
     }
+  }
+  if(includeString) {
+    var string = strings[Math.floor(Math.random() * strings.length)];
+    returnNote += ' on ';
+    returnNote += string;
   }
   return returnNote;
 }
@@ -65,7 +71,8 @@ function run() {
 
     const noteBox = document.querySelector('#note');
     const accidentalsCheck = document.querySelector('#accidentalsCheckbox');
-    noteBox.textContent = randomNote(accidentalsCheck.checked);
+    const stringCheck = document.querySelector('#stringCheckbox');
+    noteBox.textContent = randomNote(accidentalsCheck.checked, stringCheck.checked);
 
     runTimeout = setTimeout(run, waitDuration);
   }
